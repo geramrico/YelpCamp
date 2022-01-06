@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>
+        <%= campground.title %>
+    </h1>
+    <h2>
+        <%= campground.location %>
+    </h2>
+
+    <div>
+        <a href="/campgrounds/<%= campground._id %>/edit">Edit campground</a>
+    </div>
+    <div>
+        <form action="/campgrounds/<%= campground._id %>?_method=DELETE" method="post">
+            <button>Delete campground</button>
+        </form>
+    </div>
+    <div>
+        <a href="/campgrounds">Back to index</a>
+    </div>
+</body>
+
+</html>
