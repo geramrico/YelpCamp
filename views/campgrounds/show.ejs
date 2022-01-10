@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
+<% layout('layouts/boilerplate') %>
     <h1>
         <%= campground.title %>
     </h1>
     <h2>
         <%= campground.location %>
     </h2>
+    <img src="<%= campground.image %> " alt="">
+    <p><%= campground.description %> </p>
 
     <div>
         <a href="/campgrounds/<%= campground._id %>/edit">Edit campground</a>
@@ -27,6 +19,3 @@
     <div>
         <a href="/campgrounds">Back to index</a>
     </div>
-</body>
-
-</html>

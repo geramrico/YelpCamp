@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
+const ejsMate = require("ejs-mate");
 
 // Model imports
 const Campground = require("./models/campground");
@@ -17,13 +18,21 @@ db.once("open", () => {
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+app.engine("ejs", ejsMate);
+app.set("view engine", "ejs");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(methodOverride("_method"));
 
+// Middleware
+app.use((req, res, next) => {
+  console.log(req.method.toUpperCase(), req.path);
+  next();
+});
+
 // ROUTES
 app.get("/", (req, res) => {
-  res.render("home");
+  res.send("home");
 });
 
 app.get("/campgrounds", async (req, res) => {
@@ -57,7 +66,6 @@ app.get("/campgrounds/:id/edit", async (req, res) => {
 });
 
 app.patch("/campgrounds/:id", async (req, res) => {
-  //   res.send("WORKED PATCH REQ");
   const { id } = req.params;
   const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
   res.redirect(`/campgrounds/${campground._id}`);
@@ -66,6 +74,10 @@ app.patch("/campgrounds/:id", async (req, res) => {
 app.delete("/campgrounds/:id", async (req, res) => {
   await Campground.findByIdAndDelete(req.params.id);
   res.redirect("/campgrounds");
+});
+
+app.use((req, res) => {
+  res.status(404).send("NOT FOUND");
 });
 
 app.listen(3000, () => {
