@@ -7,37 +7,37 @@
     </h1>
     <div class="col-6 offset-3">
 
-        <form action="/campgrounds/<%= campground._id %>?_method=PATCH" method="POST">
+        <form action="/campgrounds/<%= campground._id %>?_method=PATCH" method="POST"  novalidate class="needs-validation">
             <div class="mb-3">
                 <label class="form-label" for="title">Campground name: </label>
                 <input class="form-control" type="text" name="campground[title]" id="title"
-                    value="<%= campground.title %>">
+                    value="<%= campground.title %>" required>
             </div>
 
             <div class="mb-3">
                 <label class="form-label" for="location">Location: </label>
                 <input class="form-control" type="text" name="campground[location]" id="location"
-                    value="<%= campground.location %>">
+                    value="<%= campground.location %>" required>
             </div>
 
             <div class="mb-3">
                 <label class="form-label" for="image">Image URL: </label>
                 <input class="form-control" type="text" name="campground[image]" id="image"
-                    value="<%= campground.image %>">
+                    value="<%= campground.image %>" required>
             </div>
 
             <div class="mb-3">
                 <label for="price">Price: </label>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="price">$</span>
-                    <input type="text" class="form-control" value="<%= campground.price %>" name="campground[price]">
+                    <input type="text" class="form-control" value="<%= campground.price %>" name="campground[price]" required>
                   </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label" for="description">Description: </label>
                 <textarea class="form-control" type="text" name="campground[description]" id="description"
-                   ><%= campground.description %></textarea>
+                    required><%= campground.description %></textarea>
             </div>
 
 
