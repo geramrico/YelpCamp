@@ -12,6 +12,8 @@ const { campgroundJoiSchema } = require("./schemas.js");
 
 // Model imports
 const Campground = require("./models/campground");
+const Review = require("./models/review");
+const { redirect } = require("express/lib/response");
 
 // Connect Mongoose
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
@@ -29,12 +31,13 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(methodOverride("_method"));
 
-// Middleware
+// Middleware to log the request, runs on every request
 app.use((req, res, next) => {
   console.log(req.method.toUpperCase(), req.path);
   next();
 });
 
+//Validation function using JOI
 const validateCampground = (req, res, next) => {
   const { error } = campgroundJoiSchema.validate(req.body);
   if (error) {
@@ -50,6 +53,7 @@ app.get("/", (req, res) => {
   res.send("home");
 });
 
+//Index route -> shows all camps
 app.get(
   "/campgrounds",
   catchAsync(async (req, res) => {
@@ -58,6 +62,7 @@ app.get(
   })
 );
 
+//Add campground via POST
 app.post(
   "/campgrounds",
   validateCampground,
@@ -95,6 +100,7 @@ app.get(
   })
 );
 
+
 app.patch(
   "/campgrounds/:id",
   validateCampground,
@@ -105,11 +111,26 @@ app.patch(
   })
 );
 
+//Delete campground by ID
 app.delete(
   "/campgrounds/:id",
   catchAsync(async (req, res) => {
     await Campground.findByIdAndDelete(req.params.id);
     res.redirect("/campgrounds");
+  })
+);
+
+//Add review to campground
+app.post(
+  "/campgrounds/:id/reviews",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const camp = await Campground.findById(id);
+    const review = new Review(req.body.review);
+    camp.reviews.push(review);
+    await review.save();
+    await camp.save();
+    res.redirect(`/campgrounds/${camp._id}`);
   })
 );
 
