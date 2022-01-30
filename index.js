@@ -1,13 +1,25 @@
 // Package requirements imports
-const path = require("path");
-const express = require("express");
-const mongoose = require("mongoose");
-const methodOverride = require("method-override");
-const ejsMate = require("ejs-mate");
+const path = require("path"); //for the views directory
+const express = require("express"); //Framework
+const mongoose = require("mongoose"); //Database
+const methodOverride = require("method-override"); //Override POST for Delete, patch, put methods
+const ejsMate = require("ejs-mate"); //Templating
+const session = require("express-session"); //For flash messages, cookies
+
+//Session configuration, cookies #489
+const sessionConfig = {
+  secret: "thisisgoingtobearealsecret",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true, //security #489
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
 
 //Utils imports
-const ExpressError = require("./utils/ExpressError");
-
+const ExpressError = require("./utils/ExpressError"); //I made this in another file, to catch errors.
 
 //Import Routes
 const campgrounds = require("./routes/campgrounds");
@@ -23,13 +35,12 @@ db.once("open", () => {
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-app.engine("ejs", ejsMate);  // For templating
-app.set("view engine", "ejs");  //Set view view engine (like handlebars, jinja, etc)
+app.engine("ejs", ejsMate); // For templating
+app.set("view engine", "ejs"); //Set view view engine (like handlebars, jinja, etc)
 app.set("views", path.join(__dirname, "views"));
 app.use(methodOverride("_method")); //To overide post method for deletes, puts, patch, etc
-app.use(express.static('public'))  // To serve static assets such as JS Scripts, css, images.
-
-
+app.use(express.static("public")); // To serve static assets such as JS Scripts, css, images.
+app.use(session(sessionConfig)); //Use session - cookies (489)
 
 // Middleware to log the request, runs on every request
 app.use((req, res, next) => {
