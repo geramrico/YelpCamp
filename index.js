@@ -23,10 +23,13 @@ db.once("open", () => {
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-app.engine("ejs", ejsMate);
-app.set("view engine", "ejs");
+app.engine("ejs", ejsMate);  // For templating
+app.set("view engine", "ejs");  //Set view view engine (like handlebars, jinja, etc)
 app.set("views", path.join(__dirname, "views"));
-app.use(methodOverride("_method"));
+app.use(methodOverride("_method")); //To overide post method for deletes, puts, patch, etc
+app.use(express.static('public'))  // To serve static assets such as JS Scripts, css, images.
+
+
 
 // Middleware to log the request, runs on every request
 app.use((req, res, next) => {
