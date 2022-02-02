@@ -29,6 +29,7 @@ router.post(
     camp.reviews.push(review);
     await review.save();
     await camp.save();
+    req.flash('success','Created new review')
     res.redirect(`/campgrounds/${camp._id}`);
   })
 );
@@ -39,9 +40,11 @@ router.delete(
   catchAsync(async (req, res) => {
     const { id, reviewId } = req.params;
   
-    //pull anython with that reviewId from reviews
+    //pull anything with that reviewId from reviews
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId); //Still have a ref in the camp
+
+    req.flash('deleted','Deleted review')
     res.redirect(`/campgrounds/${id}`);
   })
 );

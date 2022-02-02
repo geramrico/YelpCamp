@@ -34,6 +34,7 @@ router.post(
     // if (!req.body.campground) throw new ExpressError("Invalid Camp Data", 400); //Handled by the catchAsync (catches errors and sends it to next)
     const newCamp = new Campground(req.body.campground);
     await newCamp.save();
+    req.flash("success", "Created a new campground!"); //Midleware in index.js will show it
     res.redirect(`/campgrounds/${newCamp._id}`);
   })
 );
@@ -49,6 +50,13 @@ router.get(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id).populate("reviews");
+
+    // FLASH ERROR IF CAMP DOESNT EXIST
+    if (!campground) {
+      req.flash("error", "Can't find Campground");
+      res.redirect("/campgrounds");
+    }
+
     res.render("campgrounds/show", { campground });
   })
 );
@@ -59,6 +67,13 @@ router.get(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
+
+    // FLASH ERROR IF CAMP DOESNT EXIST
+    if (!campground) {
+      req.flash("error", "Can't find Campground");
+      res.redirect("/campgrounds");
+    }
+    
     res.render("campgrounds/edit", { campground });
   })
 );
@@ -70,6 +85,7 @@ router.patch(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    req.flash("success", "Successfully updated the campground!"); //Midleware in index.js will show it
     res.redirect(`/campgrounds/${campground._id}`);
   })
 );
@@ -78,7 +94,8 @@ router.patch(
 router.delete(
   "/:id",
   catchAsync(async (req, res) => {
-    await Campground.findByIdAndDelete(req.params.id);
+    const deletedCamp = await Campground.findByIdAndDelete(req.params.id);
+    req.flash("deleted", `Successfully deleted ${deletedCamp.title}`);
     res.redirect("/campgrounds");
   })
 );
