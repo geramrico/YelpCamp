@@ -7,12 +7,18 @@ const ejsMate = require("ejs-mate"); //Templating
 const session = require("express-session"); //For flash messages, cookies
 const flash = require("connect-flash");
 
+//AUTHENTICATION
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user");
+
 //Utils imports
 const ExpressError = require("./utils/ExpressError"); //I made this in another file, to catch errors.
 
 //Import Routes
-const campgrounds = require("./routes/campgrounds");
-const reviews = require("./routes/reviews");
+const campgroundsRoutes = require("./routes/campgrounds");
+const reviewsRoutes = require("./routes/reviews");
+const usersRoutes = require("./routes/users");
 
 // Connect Mongoose
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
@@ -44,6 +50,13 @@ const sessionConfig = {
 app.use(session(sessionConfig)); //Use session - cookies (489)
 app.use(flash());
 
+// Part 508
+app.use(passport.initialize()); // Read passport Docs
+app.use(passport.session()); //
+passport.use(new LocalStrategy(User.authenticate())); // We'd like to use the local strategy.  Auth method will be on user model
+passport.serializeUser(User.serializeUser()); // How do we store a user in the session
+passport.deserializeUser(User.deserializeUser()); //How to get a user out of the session
+
 // Middleware to log the request, runs on every request
 app.use((req, res, next) => {
   console.log(req.method.toUpperCase(), req.path);
@@ -59,8 +72,16 @@ app.use((req, res, next) => {
 });
 
 // ROUTES
-app.use("/campgrounds", campgrounds);
-app.use("/campgrounds/:id/reviews", reviews);
+app.get("/fakeUser", async (req, res) => {
+  const user = new User({ email: "gm@gmail.com", username: "gmr" });
+  //Register a User
+  const newUser = await User.register(user,'chicken');  //Passport
+  res.send(newUser)
+});
+
+app.use("/", userRoutes);
+app.use("/campgrounds", campgroundsRoutes);
+app.use("/campgrounds/:id/reviews", reviewsRoutes);
 
 app.get("/", (req, res) => {
   res.send("home");
