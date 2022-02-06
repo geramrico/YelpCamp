@@ -6,6 +6,8 @@ const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground");
 const { campgroundJoiSchema } = require("../schemas.js");
 
+const { isLoggedIn } = require("../middleware");
+
 //Validation function using JOI
 const validateCampground = (req, res, next) => {
   const { error } = campgroundJoiSchema.validate(req.body);
@@ -29,6 +31,7 @@ router.get(
 //Add campground via POST
 router.post(
   "/",
+  isLoggedIn,
   validateCampground,
   catchAsync(async (req, res) => {
     // if (!req.body.campground) throw new ExpressError("Invalid Camp Data", 400); //Handled by the catchAsync (catches errors and sends it to next)
@@ -40,7 +43,7 @@ router.post(
 );
 
 // New route ----->
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
   res.render("campgrounds/new");
 });
 
@@ -64,6 +67,7 @@ router.get(
 // Edit form
 router.get(
   "/:id/edit",
+  isLoggedIn,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
@@ -73,7 +77,7 @@ router.get(
       req.flash("error", "Can't find Campground");
       res.redirect("/campgrounds");
     }
-    
+
     res.render("campgrounds/edit", { campground });
   })
 );
@@ -81,6 +85,7 @@ router.get(
 //update camp info via POST
 router.patch(
   "/:id",
+  isLoggedIn,
   validateCampground,
   catchAsync(async (req, res) => {
     const { id } = req.params;
@@ -93,6 +98,7 @@ router.patch(
 //Delete campground by ID
 router.delete(
   "/:id",
+  isLoggedIn,
   catchAsync(async (req, res) => {
     const deletedCamp = await Campground.findByIdAndDelete(req.params.id);
     req.flash("deleted", `Successfully deleted ${deletedCamp.title}`);
