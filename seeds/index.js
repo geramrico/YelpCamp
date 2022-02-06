@@ -22,10 +22,11 @@ const sample = (arr) => arr[Math.floor(Math.random() * arr.length)];
 // Create data to work with
 const seedDB = async () => {
   await Campground.deleteMany({});
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     const random1000 = Math.floor(Math.random() * 1000);
     const price = Math.floor(Math.random()*20)+10
     const camp = new Campground({
+      author:'620003b34499dca11d375840',
       location: `${cities[random1000].city}, ${cities[random1000].state}`,
       title: `${sample(descriptors)} ${sample(places)}`,
       image: "https://source.unsplash.com/collection/483251",
