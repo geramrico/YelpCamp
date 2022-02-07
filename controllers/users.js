@@ -4,6 +4,10 @@ module.exports.renderNewUserForm = (req, res) => {
   res.render("users/register");
 };
 
+module.exports.renderLogin = (req, res) => {
+  res.render("users/login");
+}
+
 module.exports.createUser = async (req, res) => {
   try {
     //Example
