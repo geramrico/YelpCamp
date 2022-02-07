@@ -51,7 +51,7 @@ router.post(
   catchAsync(async (req, res) => {
     //Maybe shouldnt be async?
     req.flash("success", "welcome back!");
-    const redirectURL = req.session.returnTo; //Get the url that the user originally wanted
+    const redirectURL = req.session.returnTo || '/campgrounds'; //Get the url that the user originally wanted
     delete req.session.returnTo;
     res.redirect(redirectURL);
   })

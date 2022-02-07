@@ -2,22 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const catchAsync = require("../utils/catchAsync");
-const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground");
-const { campgroundJoiSchema } = require("../schemas.js");
 
-const { isLoggedIn } = require("../middleware");
-
-//Validation function using JOI
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundJoiSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
+const { validateCampground, isLoggedIn, isAuthor } = require("../middleware");
 
 //Index route -> shows all camps
 router.get(
@@ -69,13 +56,12 @@ router.get(
 router.get(
   "/:id/edit",
   isLoggedIn,
+  isAuthor,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
-
-    // FLASH ERROR IF CAMP DOESNT EXIST
     if (!campground) {
-      req.flash("error", "Can't find Campground");
+      req.flash("error", "Can't find Campground"); // FLASH ERROR IF CAMP DOESNT EXIST
       res.redirect("/campgrounds");
     }
 
@@ -84,15 +70,19 @@ router.get(
 );
 
 //update camp info via POST
+
 router.patch(
   "/:id",
   isLoggedIn,
+  isAuthor,
   validateCampground,
   catchAsync(async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+
+    //Original
+    const camp = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     req.flash("success", "Successfully updated the campground!"); //Midleware in index.js will show it
-    res.redirect(`/campgrounds/${campground._id}`);
+    res.redirect(`/campgrounds/${camp._id}`);
   })
 );
 
@@ -100,6 +90,7 @@ router.patch(
 router.delete(
   "/:id",
   isLoggedIn,
+  isAuthor,
   catchAsync(async (req, res) => {
     const deletedCamp = await Campground.findByIdAndDelete(req.params.id);
     req.flash("deleted", `Successfully deleted ${deletedCamp.title}`);

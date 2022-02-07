@@ -65,7 +65,7 @@ app.use((req, res, next) => {
 
 //Flash messages using middleware. Each flash message is on the route where I need to use it.
 app.use((req, res, next) => {
-  console.log(req.session);
+
   res.locals.currentUser = req.user
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
