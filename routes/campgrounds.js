@@ -40,7 +40,15 @@ router.get(
   "/:id",
   catchAsync(async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findById(id).populate("reviews").populate("author");
+    const campground = await Campground.findById(id)
+      .populate({
+        path: "reviews",   //1 populate all the reviews from the array in campground
+        populate: {       //then populate on each one of them the author
+          path: "author",
+        },
+      })
+      .populate("author"); //separetly populate the one author in the campground
+
     console.log(campground);
     // FLASH ERROR IF CAMP DOESNT EXIST
     if (!campground) {
